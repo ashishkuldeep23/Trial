@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Days Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bgDark: "#0f172a",
+            cardDark: "#020617",
+            accent: "#38bdf8",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="min-h-screen bg-bgDark text-white flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md space-y-6">
+
+    <!-- TOP: Days left in year -->
+    <div class="bg-cardDark rounded-2xl p-6 shadow-lg text-center">
+      <h2 class="text-lg font-semibold text-gray-300">Days Left This Year</h2>
+      <p id="daysLeftYear" class="text-4xl font-bold text-accent mt-3">--</p>
+    </div>
+
+    <!-- BOTTOM: Date input -->
+    <div class="bg-cardDark rounded-2xl p-6 shadow-lg space-y-4">
+      <h2 class="text-lg font-semibold text-gray-300 text-center">
+        Calculate Days From Date
+      </h2>
+
+      <input
+        type="date"
+        id="dateInput"
+        class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-accent"
+      />
+
+      <p id="dateResult" class="text-center text-xl font-semibold text-accent">
+        --
+      </p>
+
+      <div class="flex gap-3">
+        <button
+          onclick="saveAndCalculate()"
+          class="flex-1 bg-accent text-black font-semibold py-2 rounded-lg hover:opacity-90 transition"
+        >
+          Calculate
+        </button>
+
+        <button
+          onclick="resetDate()"
+          class="flex-1 bg-red-500 font-semibold py-2 rounded-lg hover:opacity-90 transition"
+        >
+          Reset
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const dateInput = document.getElementById("dateInput");
+    const dateResult = document.getElementById("dateResult");
+    const daysLeftYear = document.getElementById("daysLeftYear");
+
+    // Days left in current year
+    function calculateDaysLeftInYear() {
+      const now = new Date();
+      const endOfYear = new Date(now.getFullYear(), 11, 31);
+      const diff = endOfYear - now;
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      daysLeftYear.textContent = days;
+    }
+
+    // Calculate days difference
+    function calculateDays(dateStr) {
+      const selectedDate = new Date(dateStr);
+      const today = new Date();
+
+      selectedDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+
+      const diff = selectedDate - today;
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+      if (days > 0) {
+        dateResult.textContent = `${days} days remaining`;
+      } else if (days < 0) {
+        dateResult.textContent = `${Math.abs(days)} days ago`;
+      } else {
+        dateResult.textContent = "Today 🎉";
+      }
+    }
+
+    function saveAndCalculate() {
+      const value = dateInput.value;
+      if (!value) return;
+
+      localStorage.setItem("savedDate", value);
+      calculateDays(value);
+    }
+
+    function resetDate() {
+      localStorage.removeItem("savedDate");
+      dateInput.value = "";
+      dateResult.textContent = "--";
+    }
+
+    // Load saved date on refresh
+    function loadSavedDate() {
+      const savedDate = localStorage.getItem("savedDate");
+      if (savedDate) {
+        dateInput.value = savedDate;
+        calculateDays(savedDate);
+      }
+    }
+
+    calculateDaysLeftInYear();
+    loadSavedDate();
+  </script>
+
+</body>
+</html>
